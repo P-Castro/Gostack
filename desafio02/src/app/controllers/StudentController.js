@@ -1,5 +1,6 @@
 import * as Yup from 'yup';
 import Student from '../models/Student';
+import User from '../models/User';
 
 class StudentController {
   async store(req, res) {
@@ -17,11 +18,24 @@ class StudentController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
+    //verificar depois
+    const checkIsProvider = await User.findOne({
+      where: { id: , admin: true }
+    });
+
+    if (!checkIsProvider) {
+      return res
+        .status(401)
+        .json({ error: 'You can only create appointmens whith providers' });
+    }
+
+    /**
+     * check if student already exists
+     */
     const studentExists = await Student.findOne({
       where: { email: req.body.email },
     });
 
-    // verifica se o studante ja existe na base de dados
     if (studentExists) {
       return res.status(400).json({ error: 'Student already exists' });
     }
